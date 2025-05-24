@@ -1,0 +1,115 @@
+name: 🏃‍♂️ runcs
+author: Daniel Cazzulino
+description: Runs a C# file using .NET 10+
+
+inputs:
+  args:  
+    description: Arguments to pass to the C# file, potentially as multi-line text
+    required: false
+    default: ''
+  file:  
+    description: 'The C# file to run'
+    required: false
+    default: ''
+  script:  
+    description: 'The C# script to run'
+    required: false
+    default: ''
+outputs:
+  output:
+    description: 'Output from the C# execution'
+    value: ${{ steps.runcs.outputs.output }}
+
+branding:
+  icon: "hash"
+  color: "purple"
+
+runs:
+  using: composite
+  steps:
+    - name: ⚙ setup dotnet
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.x
+        dotnet-quality: preview
+
+    - name: 📝 script
+      id: temp-script
+      if: ${{ !inputs.file }}
+      shell: bash
+      run: |
+        temp_file=$(mktemp --suffix=.cs)
+        cat > "$temp_file" << 'EOF'
+        ${{ inputs.script }}
+        EOF
+        echo "cs=$temp_file" >> $GITHUB_OUTPUT
+        echo "Script written to temporary file: $temp_file"
+
+    - name: 📝 args
+      id: temp-args
+      if: ${{ inputs.args }}
+      shell: bash
+      run: |
+        temp_args_file=$(mktemp)
+        cat > "$temp_args_file" << 'EOF'
+        ${{ inputs.args }}
+        EOF
+        echo "args=$temp_args_file" >> $GITHUB_OUTPUT
+        echo "Args written to temporary file: $temp_args_file"
+
+    - name: 🏃‍♂️ c#
+      id: runcs
+      shell: pwsh
+      run: |
+        $file = "${{ inputs.file }}"
+        if (-not $file) {
+          $file = "${{ steps.temp-script.outputs.cs }}"
+          write-output "Using temporary script file: $file"
+        }
+
+        $args = ""
+        $argsFile = "${{ steps.temp-args.outputs.args }}"
+        if ($argsFile) {
+          $argsContent = get-content -path $argsFile -raw
+          
+          # Check if args contain newlines - if not, pass as-is
+          if ($argsContent -match '\r?\n') {
+            # Split on newlines (\n or \r\n), trim, and filter out empty lines
+            $array = $argsContent -split '\r?\n' | foreach-object { $_.Trim() } | where-object { $_ }
+            
+            # Process each argument to handle spaces and quotes
+            $processedArgs = $array | foreach-object {
+              $arg = $_
+              # Escape existing quotes (both single and double) with a backslash
+              $arg = $arg -replace '"', '\"' -replace "'", "\'"
+              # If the argument contains spaces or quotes, wrap it in double quotes
+              if ($arg -match '\s|["'']') {
+                return "`"$arg`""
+              } else {
+                return $arg
+              }
+            }
+            
+            $args = $processedArgs -join ' '
+          } else {
+            # Single line - pass as-is
+            $args = $argsContent.Trim()
+          }
+          
+          remove-item -path $argsFile -force
+          write-output "Cleaned up temporary args file"
+        }
+        
+        write-output "Running: dotnet run $file $args"
+
+        $output = & dotnet run $file $args
+        write-output "Output: $output"
+        
+        # Clean up temporary file if script was used
+        if (-not "${{ inputs.file }}") {
+          remove-item -path $file -force
+          write-output "Cleaned up temporary file: $file"
+        }
+        
+        # Set the tool output as a step output
+        echo "output=$output" >> $env:GITHUB_OUTPUT
