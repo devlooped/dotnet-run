@@ -1,4 +1,4 @@
-# :runner: runcs
+# :runner: runcsharp
 
 Runs a C# file using .NET 10+
 
@@ -6,7 +6,7 @@ Runs a C# file using .NET 10+
 
 ```
 - name: 🏃‍♂️ C#
-  uses: devlooped/actions-runcs@v1
+  uses: devlooped/actions-runcsharp@v1
   with:
     # If args has newlines, it will be properly quoted/escaped
     args: |
