@@ -1,12 +1,16 @@
 # Changelog
 
-## [v1.0](https://github.com/devlooped/actions-runcs/tree/v1.0) (2025-05-24)
+## [v1.1](https://github.com/devlooped/actions-runcsharp/tree/v1.1) (2025-05-24)
 
-[Full Changelog](https://github.com/devlooped/actions-runcs/compare/981192366e9a55ad58810c1ad0350ab67d33f003...v1.0)
+[Full Changelog](https://github.com/devlooped/actions-runcsharp/compare/v1.0...v1.1)
+
+## [v1.0](https://github.com/devlooped/actions-runcsharp/tree/v1.0) (2025-05-24)
+
+[Full Changelog](https://github.com/devlooped/actions-runcsharp/compare/981192366e9a55ad58810c1ad0350ab67d33f003...v1.0)
 
 **Merged pull requests:**
 
-- ⬆️ Bump files with dotnet-file sync [\#1](https://github.com/devlooped/actions-runcs/pull/1) ([kzu](https://github.com/kzu))
+- ⬆️ Bump files with dotnet-file sync [\#1](https://github.com/devlooped/actions-runcsharp/pull/1) ([kzu](https://github.com/kzu))
 
 
 
