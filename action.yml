@@ -1,6 +1,6 @@
-name: runcsharp
+name: dotnet-run
 author: Daniel Cazzulino
-description: Runs a C# file using .NET 10+
+description: Runs a C# file or script using .NET 10+
 
 inputs:
   args:  
